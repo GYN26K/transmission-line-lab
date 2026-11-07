@@ -79,3 +79,17 @@ Zin = Z0 (ZL + Z0 tanh(γl)) / (Z0 + ZL tanh(γl))
 The application plots instantaneous voltage/current, voltage and current upper/lower magnitude envelopes, relative attenuation, local reflection magnitude/VSWR, average power flow and distributed conductor/dielectric power loss. Power is calculated using peak phasors, so `Pavg = 0.5 Re(V I*)`.
 
 **Model limits:** sinusoidal steady state only; no transient pulse simulation, frequency-dependent material models, skin-effect model, or dispersive dielectric model. In the complex-Z0 general lossy mode, voltage-wave reflection coefficient is used. Conventional VSWR interpretation is most straightforward when the reference impedance is real and positive.
+
+## Publish the website on GitHub Pages
+
+This repository includes a GitHub Actions workflow at `.github/workflows/deploy.yml` and a relative Vite base path, so the site can be hosted from a GitHub repository without changing source paths.
+
+1. Create a new GitHub repository (for example, `transmission-line-lab`).
+2. Extract this project ZIP and upload the **contents** of the `transmission-line-lab` folder to the repository root. The root must contain `package.json`, `index.html`, `vite.config.js`, `src/`, and `.github/`.
+3. Commit the files to the `main` branch.
+4. In GitHub, open **Settings → Pages**.
+5. Under **Build and deployment → Source**, select **GitHub Actions**.
+6. Open the repository's **Actions** tab and wait for the **Deploy to GitHub Pages** workflow to finish successfully.
+7. Open the published URL shown in the workflow's deployment summary. It will normally be `https://YOUR-USERNAME.github.io/YOUR-REPOSITORY/`.
+
+Whenever you push a new commit to `main`, GitHub Actions automatically rebuilds and republishes the website. The repository itself stores the source code; GitHub Pages hosts the built website so visitors can open the URL without installing Node.js.

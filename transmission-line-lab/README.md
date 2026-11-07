@@ -76,5 +76,6 @@ Zin = Z0 (ZL + Z0 tanh(γl)) / (Z0 + ZL tanh(γl))
 Γin = ΓL exp(-2γl)
 ```
 
+The application plots instantaneous voltage/current, voltage and current upper/lower magnitude envelopes, relative attenuation, local reflection magnitude/VSWR, average power flow and distributed conductor/dielectric power loss. Power is calculated using peak phasors, so `Pavg = 0.5 Re(V I*)`.
 
-Whenever you push a new commit to `main`, GitHub Actions automatically rebuilds and republishes the website. The repository itself stores the source code; GitHub Pages hosts the built website so visitors can open the URL without installing Node.js.
+**Model limits:** sinusoidal steady state only; no transient pulse simulation, frequency-dependent material models, skin-effect model, or dispersive dielectric model. In the complex-Z0 general lossy mode, voltage-wave reflection coefficient is used. Conventional VSWR interpretation is most straightforward when the reference impedance is real and positive.

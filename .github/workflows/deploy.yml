@@ -1,5 +1,5 @@
 
-name: Deploy to GitHub Pages
+name: Deploy Transmission Line Lab
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: github-pages
   cancel-in-progress: true
 
 jobs:
@@ -30,50 +30,50 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Debug repository structure
+      - name: Verify project structure
         run: |
-          echo "Current directory:"
-          pwd
-
           echo "Repository root:"
+          pwd
           ls -la
 
-          echo "Source directory:"
-          ls -la src/ || true
+          echo "Checking source files:"
+          ls -la src/
 
-          echo "Find main.jsx:"
-          find . -type f -iname "main.jsx" \
-            -not -path "./node_modules/*" \
-            -not -path "./.git/*"
-
-          echo "Check exact entry point:"
+          test -f index.html
+          test -f package.json
+          test -f package-lock.json
           test -f src/main.jsx
+          test -f src/App.jsx
+
+          echo "All required files found."
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Verify entry point
-        run: |
-          node -e "const fs=require('fs'); console.log('main.jsx exists:', fs.existsSync('src/main.jsx')); if (!fs.existsSync('src/main.jsx')) process.exit(1)"
-
-      - name: Build project
+      - name: Build application
         run: npm run build
 
-      - name: Setup Pages
+      - name: Verify build output
+        run: |
+          test -f dist/index.html
+          echo "Build successful."
+          ls -la dist/
+
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload build artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: dist
 
   deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Deploy to GitHub Pages

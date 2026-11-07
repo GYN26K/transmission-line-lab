@@ -1,0 +1,81 @@
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Debug repository structure
+        run: |
+          echo "Current directory:"
+          pwd
+
+          echo "Repository root:"
+          ls -la
+
+          echo "Source directory:"
+          ls -la src/ || true
+
+          echo "Find main.jsx:"
+          find . -type f -iname "main.jsx" \
+            -not -path "./node_modules/*" \
+            -not -path "./.git/*"
+
+          echo "Check exact entry point:"
+          test -f src/main.jsx
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Verify entry point
+        run: |
+          node -e "const fs=require('fs'); console.log('main.jsx exists:', fs.existsSync('src/main.jsx')); if (!fs.existsSync('src/main.jsx')) process.exit(1)"
+
+      - name: Build project
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload build artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
